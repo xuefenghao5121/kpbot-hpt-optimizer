@@ -1,0 +1,37 @@
+{
+  "app": "lammps",
+  "targets": {
+    "aarch64": {
+      "backend": "native",
+      "toolchain": "hpckit+bisheng+hmpi+kml",
+      "version": "2023.8.2",
+      "case": "lammps.in",
+      "jarvis_config": "templates/lammps/2023.8.2/data.lammps.arm.cpu.config"
+    },
+    "x86_64": {
+      "backend": "native",
+      "toolchain": "gcc+openmpi",
+      "version": "2023.8.2",
+      "case": "lammps.in"
+    }
+  },
+  "execution": {"mode": "mpi", "nodes": 1, "ranks": 4, "threads": 1},
+  "alt_execution": {"mode": "mpi+omp", "nodes": 1, "ranks": 2, "threads": 2},
+  "metric": "Matom-step/s",
+  "min_gain": 0.01,
+  "job": "job.fmt",
+  "gate": {
+    "metric_pattern": "([\\d.]+)\\s+(katom|Matom)-step/s",
+    "compile_pattern": "error:|Error \\d|command not found",
+    "drift_columns": 3,
+    "drift_max": 0.05
+  },
+  "route": {},
+  "budget": 16,
+  "axes": [
+    {"name": "timestep", "values": [2.0, 1.0, 2.5]},
+    {"name": "neighbor_skin", "values": [2.0, 2.5, 3.0]},
+    {"name": "cutoff", "values": [9.8, 10.0]},
+    {"name": "balance", "values": [0, 1]}
+  ]
+}

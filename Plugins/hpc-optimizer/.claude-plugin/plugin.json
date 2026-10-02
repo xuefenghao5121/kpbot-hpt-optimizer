@@ -1,0 +1,11 @@
+{
+  "name": "hpc-optimizer",
+  "version": "0.1.0",
+  "description": "HPC 应用试验环。按应用目录搜索参数并记账。aarch64 结果才是鲲鹏交付，x86_64 只作对照。不改源码，不做绑核和 BIOS。",
+  "author": {
+    "name": "Kunpeng Acceleration Team"
+  },
+  "license": "MulanPSL-2.0",
+  "keywords": ["performance", "lammps", "hpc", "kunpeng", "aarch64"],
+  "platforms": ["claude", "opencode"]
+}

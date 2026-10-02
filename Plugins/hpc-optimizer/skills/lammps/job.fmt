@@ -1,0 +1,45 @@
+set -euo pipefail
+{setup}
+{env}
+{deps}
+mkdir -p "$SRC"
+cd "$SRC"
+# ponytail: an existing {source} directory is reused; delete it to unpack again
+# ponytail: find walks the source tree each trial; a content hash if that gets slow
+need_build=0
+if [ ! -x "$PREFIX/bin/{binary}" ]; then
+  need_build=1
+elif [ "$(cat "$PREFIX/.hpc-opt-version" 2>/dev/null || true)" != "{build_id}" ]; then
+  need_build=1
+elif [ -d "{source}" ] && [ -n "$(find "{source}" -type f -newer "$PREFIX/bin/{binary}" -not -path '*/build/*' -print -quit)" ]; then
+  need_build=1
+fi
+if [ "$need_build" = 1 ]; then
+  if [ ! -d {source} ]; then
+    if [ -f {source}.tar.gz ]; then
+      tar -xf {source}.tar.gz
+    elif [ -f {source}.zip ]; then
+      python3 -m zipfile -e {source}.zip .
+    else
+      curl -L -o {source}.tar.gz {download_url}
+      tar -xf {source}.tar.gz
+    fi
+  fi
+  cd {source}/cmake/presets
+  cp basic.cmake custom.cmake
+  sed -i '4s/.*/set(ALL_PACKAGES {packages})/' custom.cmake
+  cd ../..
+  cmake -S cmake -B build -C cmake/presets/custom.cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_CXX_COMPILER={cxx} \
+    -DCMAKE_CXX_FLAGS_RELEASE="{cxx_flags}" \
+    -DLAMMPS_MACHINE=mpi \
+{fft_line}{cmake_extra}    -DCMAKE_INSTALL_PREFIX="$PREFIX"
+  cmake --build build -j"$(nproc)"
+  cmake --install build
+  echo "{build_id}" > "$PREFIX/.hpc-opt-version"
+fi
+export PATH="$PREFIX/bin:$PATH"
+cd "$WORK"
+export OMP_NUM_THREADS={threads}
+{launcher} -np {ranks} {binary} -in in.trial

@@ -1,0 +1,20 @@
+{
+  "version": "2025.7.22",
+  "source": "lammps-stable_22Jul2025",
+  "download_url": "https://github.com/lammps/lammps/archive/refs/tags/stable_22Jul2025.tar.gz",
+  "packages": "KSPACE MANYBODY MOLECULE RIGID GRANULAR",
+  "cxx_flags": "-O3 -ffp-contract=off -DNDEBUG",
+  "stack": ["gcc", "openmpi"],
+  "fft": "KISS",
+  "dependency": ["cmake", "make", "mpicxx"],
+  "binary": "lmp_mpi",
+  "install_name": "lammps",
+  "launcher": "mpirun --oversubscribe",
+  "defaults": {
+    "timestep": 2.0,
+    "neighbor_skin": 2.0,
+    "cutoff": 9.8,
+    "balance": 0
+  },
+  "append": [{"param": "balance", "min": 1, "line": "balance 1.0 shift xyz 5 1.1"}]
+}
